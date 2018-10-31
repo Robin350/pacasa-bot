@@ -77,7 +77,7 @@ not_asked = ["Me cago en la puta, no sabes ni leer, ponlo BIEN", "Joder chaval, 
 borderias = ['Tus muertos', 'Inutil', 'No te quieren ni en tu casa', 'Tu puta madre pero de colegueo', 'Le caes bastante mal a todos', 
             'A decir verdad, e incluso teniendo en cuenta el clima economico actual, tu cara es una basura', "Menudo aborto estas hecho",
             "Te pareces al michel de motril" , "Jajajajaja que bocana has echao vieo" , "No te soporta ni Kiiro, y mira que le da igual la vida",
-            "Ni tu mae te quiere"]
+            "Ni tu mae te quiere" , "¿Te pasa algo?"]
 
 token = URI.encode(MyFile.new("db/.TOKEN").get_item(0).chop)
 
