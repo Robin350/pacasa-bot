@@ -74,7 +74,10 @@ repeated_add = ["Eso ya estaba guardado puto inutil"]
 repeated_remove = ["Eso no estaba guardado retrasado"]
 error = ["Que raro, con lo bien programado que estoy, y aun asi, ha ocurrido algun error"]
 not_asked = ["Me cago en la puta, no sabes ni leer, ponlo BIEN", "Joder chaval, PON LO QUE TE PIDO RETRASADO", "Venga ahora fuera coñas, ponlo bien", "Que le decimos a este, te coges el mensaje este finde y pones lo que te pido, tamos?"]
-borderias = ['Tus muertos', 'Inutil', 'No te quieren ni en tu casa', 'Tu puta madre pero de colegueo', 'Le caes bastante mal a todos', 'A decir verdad, e incluso teniendo en cuenta el clima economico actual, tu cara es una basura']
+borderias = ['Tus muertos', 'Inutil', 'No te quieren ni en tu casa', 'Tu puta madre pero de colegueo', 'Le caes bastante mal a todos', 
+            'A decir verdad, e incluso teniendo en cuenta el clima economico actual, tu cara es una basura', "Menudo aborto estas hecho",
+            "Te pareces al michel de motril" , "Jajajajaja que bocana has echao vieo" , "No te soporta ni Kiiro, y mira que le da igual la vida",
+            "Ni tu mae te quiere"]
 
 token = URI.encode(MyFile.new("db/.TOKEN").get_item(0).chop)
 
@@ -196,7 +199,8 @@ begin
               i = 0
               text = "Por suerte, no hay ninguna factura todavia"
               while(i<facturas.size)
-                text = "---#{facturas.get_item(i).first}---\n Cantidad Total->#{facturas.get_item(i).second[0]} \n Cada Uno->#{(facturas.get_item(i).second[0])/num_members}\n Ha pagado:"
+                text = "---#{facturas.get_item(i).first}---\n Cantidad Total->#{facturas.get_item(i).second[0]} \n 
+                Cada Uno->#{(facturas.get_item(i).second[0])/num_members}\n Ha pagado:"
                 if(facturas.get_item(i).second.size > 1)
                   first = true
                   for p in facturas.get_item(i).second
@@ -214,10 +218,38 @@ begin
               pacasa_bot.api.send_message(chat_id: current_chat, text: text)
 
             when /compras/
-              pacasa_bot.api.send_message(chat_id: current_chat, text: "Not Implemented")
-
+              ##pacasa_bot.api.send_message(chat_id: current_chat, text: "Not Implemented")
+              i = 0
+              text = "No le debemos dinero a nadie gracias al señor"
+              while(i < compras.size)
+                text = "---#{compras.get_item(i).first}---\n Total->#{compras.get_item(i).second[0]} \n Cada uno ->#{(compras.get_item(i).second[0])/num_members}\n
+                Ha pagado ya:  "
+                if(compras.get_item(i).second.size > 1)
+                  first = true
+                  for p in compras.get_item(i).second
+                    if(first)
+                      first = false
+                    else
+                      text += members.get_value(p)
+                    end
+                  end
+                else
+                  text += "Ni cristofer chaval\n"
+                end
+                i+=1
+              end
+              pacasa_bot.api.send_message(chat_id: current_chat, text: text)
             when /notas/
-              pacasa_bot.api.send_message(chat_id: current_chat, text: "Not Implemented")
+              ##pacasa_bot.api.send_message(chat_id: current_chat, text: "Not Implemented")
+              i = 0
+              text = "Menos mal que nadie ha puesto ninguna tonteria en una nota"
+              while(i < notas.size)
+                user = notas.get_item(i).first
+                text= "*******NOTA DE #{user}*********\n"
+                text += "#{notas.get_item(i).second} \n"
+                text += "#{borderias.sample} #{user} "
+              end
+              pacasa_bot.api.send_message(chat_id: current_chat, text: text)
             else
               puts "Error, action es -#{action}-"
             end
