@@ -32,4 +32,20 @@ class MyPair
     end
   end
 
+  def key(value = nil)
+    if(value == nil)
+      return @first
+    else
+      @first = value
+    end
+  end
+
+  def value(value = nil)
+    if(value == nil)
+      return @second
+    else
+      @second = value
+    end
+  end
+
 end

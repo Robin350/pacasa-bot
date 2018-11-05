@@ -2,6 +2,7 @@ require 'telegram/bot'
 require_relative '../lib/my_file'
 require_relative '../lib/my_pair'
 require_relative '../lib/my_map'
+require_relative '../lib/my_utils'
 #
 # Coded by Robin Costas del Moral
 #
@@ -10,61 +11,6 @@ require_relative '../lib/my_map'
 # administrator name. Once done, you can add/remove payments and set who
 # has already paid and so on
 #  
-# Await response from a certain user, it returns the response
-
-#! Convendria crear un fichero my_utils y meter todas las funciones chorra estas
-def await_response(user, pacasa_bot)
-  response = false
-  while(!response)
-    pacasa_bot.fetch_updates do |message|
-      if (message.from.id == user)
-        response = true
-        return message
-      end
-    end
-  end
-end
-
-def await_int(user, pacasa_bot)
-  stop = false
-  while(!stop)
-    pacasa_bot.fetch_updates do |message|
-      begin
-        if (message.from.id == user)
-          stop = true
-          ret = Integer(message.text)
-          return ret
-            
-        end
-      rescue ArgumentError
-        # If they dont enter an Int, we ask for the information again
-        pacasa_bot.api.send_message(chat_id: current_chat, text: not_asked.sample)
-        stop = false
-      end
-    end
-  end
-end
-
-def await_float(user, pacasa_bot)
-  stop = false
-  while(!stop)
-    pacasa_bot.fetch_updates do |message|
-      begin
-        if (message.from.id == user)
-          stop = true
-          ret = Float(message.text)
-          return ret
-            
-        end
-      rescue ArgumentError
-        # If they dont enter an Int, we ask for the information again
-        pacasa_bot.api.send_message(chat_id: current_chat, text: not_asked.sample)
-        stop = false
-      end
-    end
-  end
-end
-
 
 # Arrays that contain different responses so it isnt too repetitive
 success_add = ["Tremenda ejecucion, ya la he introducido","Con pocas ganas pero lo he añadido","Me caes bastante mal, pero aun asi lo he añadido"]
@@ -90,7 +36,7 @@ current_chat = nil
 timer = nil
 current_time = nil
 
-# We will have a map for each type of payment, PONER EL TOTAL NO EL DIVIDIDO
+# We will have a map for each type of payment
 # facturas: agua, luz, internet
 # compras: compras por los miembros del piso
 # notas: Anotaciones de cualquier cosa
