@@ -18,29 +18,21 @@ class MyMap
   # keys: array of keys of the map
   # values: array of values of the map
   # NOTE: The index on either array is the same for a pair key/value
-  def initialize(file)
-    @db     = nil
+  def initialize()
     @keys   = Array.new
     @values = Array.new
-
-    if(!@db.nil?)
-      x = 0
-      while x < @db.content.size
-        @keys   << @db.get_item(x)
-
-        @values[x/2] = Array.new
-        @values[x/2] << @db.get_item(x+1)
-        
-        x+=2
-      end
-    end
   end
 
   # adds a pair of key/value
   def add_item(key, value)
-    @keys << key
-    @values[@keys.size-1] = Array.new
-    @values[@keys.size-1] << value
+    index = find(key)
+    if(index == -1)  
+      @keys << key
+      @values[@keys.size-1] = Array.new
+      @values[@keys.size-1] << value
+    else
+      add_value(key,value)
+    end
   end
 
   # return: pair with key/value(s) of that index
@@ -105,26 +97,9 @@ class MyMap
     return -1
   end
 
-  # Writes the changes made to db file
-  def write_to_db
-    text = Array.new
-
-    i=0
-    while i<@keys.size
-      text << @keys[i]
-
-      tmp = ""
-      for val in @values[i]
-        tmp += "#{val},"
-      end
-      tmp += ";"
-      text << tmp
-
-      i+=1
-    end
-
-    @db.content = text
-    @db.write_to_file
+  def is_value(key)
+    index = find(key)
+    return @values[index].include?("")    
   end
 
 end
