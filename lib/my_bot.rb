@@ -18,12 +18,17 @@ class MyBot
   end
 
   def send_message(text, reply_markup=nil)
-    if(reply_markup.nil?)
+    if(!reply_markup.nil?)
       @bot.send_message(chat_id: @current_chat, text: text, reply_markup: reply_markup)
     else
       @bot.send_message(chat_id: @current_chat, text: text)
     end
   end
+
+  def send_audio(audio)
+    @bot.send_audio(chat_id: @current_chat,audio: audio)
+  end
+
 
   def await_message(user = nil)
     @bot.get_updates do |update|
@@ -44,8 +49,8 @@ class MyBot
     return answers
   end
 
-  def get_force_reply
-    return Telegrammer::DataTypes::ForceReply.new(force_reply: true, selective: true)
+  def get_force_reply(selective)
+    return Telegrammer::DataTypes::ForceReply.new(force_reply: true, selective: selective)
   end
   
 

@@ -1,5 +1,3 @@
-require 'matrix'
-require_relative 'my_file'
 require_relative 'my_pair'
 #
 # Coded by Robin Costas del Moral
