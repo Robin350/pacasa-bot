@@ -42,9 +42,16 @@ class MyBot
     end
   end  
 
-  def create_keyboard(options)
+  def create_keyboard(options, selective = false)
     answers = Telegrammer::DataTypes::ReplyKeyboardMarkup
-    .new(keyboard: options, one_time_keyboard: true)
+    .new(keyboard: options, one_time_keyboard: true, selective: selective)
+
+    return answers
+  end
+
+  def create_inline_keyboard(options)
+    answers = Telegrammer::DataTypes::InlineKeyboardMarkup
+    .new(keyboard: options)
 
     return answers
   end
