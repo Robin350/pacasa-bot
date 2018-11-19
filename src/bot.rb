@@ -30,6 +30,7 @@ members   = MyMap.new()
 initialized = false
 current_chat = nil
 num_members = 0
+admin = ""
 
 # Shitty variables
 spain = "\xF0\x9F\x87\xAA\xF0\x9F\x87\xB8"
@@ -67,6 +68,10 @@ begin
         while i<num_members
           pacasa_bot.send_message("Makina numero #{i+1}:", pacasa_bot.get_force_reply(false))
           response = pacasa_bot.await_message
+          if(i==0)
+            admin = response.from.username
+          end
+          
           if(members.find(response.from.username)==-1)
             members.add_item(response.from.username, response.from.first_name)
             pacasa_bot.send_message("Apunto al inutil de #{response.from.first_name}")
@@ -79,11 +84,11 @@ begin
 
     end 
   end
-  puts "a exarlo to abajo"
+  
   while(true)
     message = pacasa_bot.await_message
     pacasa_bot.current_chat = message.chat.id
-    puts "hay mensaje, #{message.text}"
+    #puts "hay mensaje, #{message.text}"
     case message.text
       when /\/pacasa/
         pacasa_bot.send_message("#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}#{spain}\n"+
@@ -100,31 +105,35 @@ begin
         case action
           ############################################# factura
           when /factura/
-            pacasa_bot.send_message("Dime el nombre de la factura @#{message.from.username}", pacasa_bot.get_force_reply(true))
-            name = pacasa_bot.await_message(message.from.username).text
-            pacasa_bot.send_message("Poca broma con #{name}, @#{message.from.username} cuanto es la basura esta?",pacasa_bot.get_force_reply(true))
-            quantity = 0
-            continue = true
-            while(continue)
-              begin
-                quantity = Float(pacasa_bot.await_message(message.from.username).text)
-                continue = false
-              rescue ArgumentError
-                pacasa_bot.send_message(responses.not_asked.sample)
+            if(message.from.username == admin)
+              pacasa_bot.send_message("Dime el nombre de la factura @#{message.from.username}", pacasa_bot.get_force_reply(true))
+              name = pacasa_bot.await_message(message.from.username).text
+              pacasa_bot.send_message("Poca broma con #{name}, @#{message.from.username} cuanto es la basura esta?",pacasa_bot.get_force_reply(true))
+              quantity = 0
+              continue = true
+              while(continue)
+                begin
+                  quantity = Float(pacasa_bot.await_message(message.from.username).text)
+                  continue = false
+                rescue ArgumentError
+                  pacasa_bot.send_message(responses.not_asked.sample)
+                end
               end
-            end
-            pacasa_bot.send_message("Vamos a revisar los datos que seguro que te has equivocado:\n"+
-                                    "Factura: #{name}\n"+
-                                    "Cantidad: #{quantity}\n"+
-                                    "Cada uno: #{quantity/num_members}\n"+
-                                    "Son correctos los datos @#{message.from.username}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
-            response = pacasa_bot.await_message(message.from.username).text
-            if(response == 'SI')
-              pacasa_bot.send_message("Pues tendre que introducir la factura de mierda esa, #{responses.borderias.sample}")
-              facturas.add_item(name, quantity)
+              pacasa_bot.send_message("Vamos a revisar los datos que seguro que te has equivocado:\n"+
+                                      "Factura: #{name}\n"+
+                                      "Cantidad: #{quantity}\n"+
+                                      "Cada uno: #{quantity/num_members}\n"+
+                                      "Son correctos los datos @#{message.from.username}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+              response = pacasa_bot.await_message(message.from.username).text
+              if(response == 'SI')
+                pacasa_bot.send_message("Pues tendre que introducir la factura de mierda esa, #{responses.borderias.sample}")
+                facturas.add_item(name, quantity)
 
+              else
+                pacasa_bot.send_message("Si esque estaba clarisimo que no servias para nada, #{responses.borderias.sample}")
+              end
             else
-              pacasa_bot.send_message("Si esque estaba clarisimo que no servias para nada, #{responses.borderias.sample}")
+              pacasa_bot.send_message("Solo puede introducir facturas el admin del grupo (Por desgracia @#{admin})")
             end
             
           ############################################# compra
@@ -151,6 +160,7 @@ begin
             if(response == 'SI')
               pacasa_bot.send_message("Pues nada habra que guardarla, #{responses.borderias.sample}")
               compras.add_item(name, quantity)
+              compras.add_value(name, message.from.username)
 
             else
               pacasa_bot.send_message("Como si supieras hacer algo, #{responses.borderias.sample}")
@@ -201,8 +211,8 @@ begin
               if(item.second.size == 1)
                   text += "    \xF0\x9F\x91\x8C Nadie xdd\n"
               else
-                for p in 1..item.second.size
-                  text += "    \xE2\x9C\x85 #{p}"
+                for p in 1..(item.second.size-1)
+                  text += "    \xE2\x9C\x85 @#{item.second.at(p)}\n"
                 end
               end
               text += "_______________________\n\n"
@@ -215,15 +225,15 @@ begin
             for i in 0..(compras.size-1)
               item = compras.get_item(i)
               text += "_______________________\n"+
-                      "\xE2\x96\xB6 #{item.first} \xE2\x97\x80\n"+
+                      "\xE2\x96\xB6 @#{item.second.at(1)}: #{item.first} \xE2\x97\x80\n"+
                       "\xF0\x9F\x92\xB0 Total: #{item.second.at(0)}€\n"+
                       "    \xF0\x9F\x92\xB2 Cada uno: #{item.second.at(0)/num_members}€\n"+
                       " \xF0\x9F\x91\x89 Ha pagado \n"
-              if(item.second.size == 1)
+              if(item.second.size == 2)
                   text += "    \xF0\x9F\x91\x8C Nadie xdd\n"
               else
-                for p in 1..item.second.size
-                  text += "    \xE2\x9C\x85 #{p}"
+                for p in 2..(item.second.size-1)
+                  text += "    \xE2\x9C\x85 #{item.second.at(p)}"
                 end
               end
               text += "_______________________\n\n"
@@ -238,7 +248,7 @@ begin
               text += "_______________________\n"+
                       "\xE2\x9D\x97 #{item.first} \xE2\x81\x89\n"+
                       "\xE2\xAD\x90 @#{item.second.at(1)}:\n"+
-                      "#{item.second.at(0)}"+
+                      "#{item.second.at(0)}\n"+
                       "_______________________\n\n"
             end
             pacasa_bot.send_message(text)
@@ -247,24 +257,222 @@ begin
                                     "/list (facturas/compras/notas)")
         end
 
-      when /\/pay/
-        message.text.slice!("/pay ")
+      when /\/pagada/
+        message.text.slice!("/pagada ")
         action = message.text
 
         case action
           ############################################# factura
           when /factura/
+            if(message.from.username == admin)
+              if(facturas.size>0)
+                kb = Array.new
+                for i in 0..(facturas.size-1)
+                  kb << [String(facturas.get_item(i).first)]   
+                end
+                if(kb.size > 0)
+                  pacasa_bot.send_message("Que factura te han pagado @#{message.from.username}?",pacasa_bot.create_keyboard(kb,true))
 
+                  selected = pacasa_bot.await_message.text
+
+                  mem = Array.new
+                  if(num_members > 1)
+                    for i in 1..(num_members-1)
+                      mem << [String(members.get_item(i).first)] 
+                    end
+                    pacasa_bot.send_message("Quien te ha pagado @#{message.from.username}?",pacasa_bot.create_keyboard(mem,true))
+                  end
+
+                  payer = pacasa_bot.await_message.text
+
+                  pacasa_bot.send_message("Entonces #{payer} te ha pagado #{selected}, es asi @#{admin}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+                    
+                  response = pacasa_bot.await_message(message.from.username).text
+                    
+                  if(response == 'SI')
+                    if(facturas.is_value(selected, payer))
+                      pacasa_bot.send_message("Ese ya habia pagado inutil")                  
+                    else
+                      pacasa_bot.send_message("Impresionante, lo apunto")
+                      facturas.add_value(selected, payer)
+                    end
+                  else
+                    pacasa_bot.send_message("Ya me parecia a mi que era raro que alguien te hubiese pagado")
+                  end
+                else
+                  pacasa_bot.send_message("No hay facturas pendiendes inutil")
+                end
+              else
+                pacasa_bot.send_message("Vaya basura de administrador que no sabe que no hay ninguna factura")
+              end
+
+            else
+              pacasa_bot.send_message("Pero donde vas tu, como si sirvieras para administrar algo")
+            end
             
           ############################################# compra
           when /compra/
+            if(compras.size > 0)
+              kb = Array.new
+              for i in 0..(compras.size-1)
+                if(compras.get_item(i).second.at(1) == message.from.username)
+                  kb << [String(compras.get_item(i).first)]  
+                end 
+              end
+              if(kb.size>0)
+                pacasa_bot.send_message("Que compra te han pagado @#{message.from.username}?",pacasa_bot.create_keyboard(kb,true))
+
+                selected = pacasa_bot.await_message.text
+
+                mem = Array.new
+                if(num_members > 1)
+                  for i in 0..(num_members-1)
+                    if(members.get_item(i).first != message.from.username)
+                      mem << [String(members.get_item(i).first)] 
+                    end
+                  end
+                  pacasa_bot.send_message("Quien te ha pagado @#{message.from.username}?",pacasa_bot.create_keyboard(mem,true))
+                end
+
+                payer = pacasa_bot.await_message.text
+
+                pacasa_bot.send_message("Entonces #{payer} te ha pagado #{selected}, es asi @#{message.from.username}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+                  
+                response = pacasa_bot.await_message(message.from.username).text
+                  
+                if(response == 'SI')
+                  if(compras.is_value(selected,payer))
+                    pacasa_bot.send_message("Ese ya habia pagado inutil")                  
+                  else
+                    pacasa_bot.send_message("Impresionante, lo apunto")
+                    compras.add_value(selected, payer)
+                  end
+                else
+                  pacasa_bot.send_message("Ya me parecia a mi que era raro que alguien te hubiese pagado")
+                end
+              else
+                pacasa_bot.send_message("Yo a veces tambien me invento que me tienen que pagar")
+              end
+            else
+              pacasa_bot.send_message("No hay ninguna compra todavia makina")
+            end
 
 
           else
             pacasa_bot.send_message("A ver si aprendes a usar la basura esta:\n"+
-                                    "/list (facturas/compras/notas)")
-        end
-    end
+                                    "/pagada (factura/compra)\n"+
+                                    "Solo puedes administrar pagos de facturas/pagos que hayas puesto tu")
+          end
+
+        when /\/remove/
+          message.text.slice!("/pagada ")
+        action = message.text
+
+        case action
+          ############################################# factura
+          when /factura/
+            if(message.from.username == admin)
+              if(facturas.size>0)
+                kb = Array.new
+                for i in 0..(facturas.size-1)
+                  kb << [String(facturas.get_item(i).first)]   
+                end
+                if(kb.size > 0)
+                  pacasa_bot.send_message("Que factura quieres quitar @#{message.from.username}?",pacasa_bot.create_keyboard(kb,true))
+
+                  selected = pacasa_bot.await_message.text
+
+                  pacasa_bot.send_message("Entonces quieres quitar #{selected}, es asi @#{admin}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+                    
+                  response = pacasa_bot.await_message(message.from.username).text
+                    
+                  if(response == 'SI')
+                    pacasa_bot.send_message("Por fin, borrada correctamente")
+                    facturas.remove_item(facturas.find(selected))
+                  else
+                    pacasa_bot.send_message("Me cago en la puta, ya podrias haberla borrado")
+                  end
+                else
+                  pacasa_bot.send_message("No hay facturas pendiendes inutil")
+                end
+              else
+                pacasa_bot.send_message("Vaya basura de administrador que no sabe que no hay ninguna factura")
+              end
+
+            else
+              pacasa_bot.send_message("Pero donde vas tu, como si sirvieras para administrar algo")
+            end
+            
+          ############################################# compra
+          when /compra/
+            if(compras.size > 0)
+              kb = Array.new
+              for i in 0..(compras.size-1)
+                if(compras.get_item(i).second.at(1) == message.from.username)
+                  kb << [String(compras.get_item(i).first)]  
+                end 
+              end
+              if(kb.size>0)
+                pacasa_bot.send_message("Que compra quieres quitar @#{message.from.username}?",pacasa_bot.create_keyboard(kb,true))
+
+                selected = pacasa_bot.await_message.text
+
+                pacasa_bot.send_message("Entonces pacasa que se va #{selected}, es asi @#{message.from.username}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+                  
+                response = pacasa_bot.await_message(message.from.username).text
+                  
+                if(response == 'SI')
+                  pacasa_bot.send_message("Nos vemos")
+                  compras.remove_item(compras.find(selected))
+                else
+                  pacasa_bot.send_message("Ya te vale")
+                end
+              else
+                pacasa_bot.send_message("Yo a veces tambien me invento que me tienen que pagar")
+              end
+            else
+              pacasa_bot.send_message("No hay ninguna compra todavia makina")
+            end
+
+          when /nota/
+            if(notas.size > 0)
+              kb = Array.new
+              for i in 0..(notas.size-1)
+                if(notas.get_item(i).second.at(1) == message.from.username)
+                  kb << [String(notas.get_item(i).first)]  
+                end 
+              end
+              if(kb.size>0)
+                pacasa_bot.send_message("Que nota quieres quitar @#{message.from.username}?",pacasa_bot.create_keyboard(kb,true))
+
+                selected = pacasa_bot.await_message.text
+
+                pacasa_bot.send_message("Entonces pacasa que se va #{selected}, es asi @#{message.from.username}?", pacasa_bot.create_keyboard([['SI'],['NO']],true))
+                  
+                response = pacasa_bot.await_message(message.from.username).text
+                  
+                if(response == 'SI')
+                  pacasa_bot.send_message("Nos vemos")
+                  notas.remove_item(notas.find(selected))
+                else
+                  pacasa_bot.send_message("Borra ya alguna de las peliculas que te montas")
+                end
+              else
+                pacasa_bot.send_message("Pero que vas a tener tu escrito aqui si no sabes nu contar")
+              end
+            else
+              pacasa_bot.send_message("Por suerte nadie ha decidido poner una nota todavia")
+            end
+
+
+          else
+            pacasa_bot.send_message("A ver si aprendes a usar la basura esta:\n"+
+                                    "/remove (factura/compra/nota)\n"+
+                                    "Solo puedes quitar cosas que hayas puesto tu")
+          end
+        else
+          pacasa_bot.send_message(responses.borderias.sample)
+      end
   end
 
 rescue SignalException => e   ################################################################################################################### FIN

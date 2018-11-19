@@ -82,22 +82,27 @@ class MyMap
     return @keys.size
   end
 
+  def is_value(key, value)
+    index = find(key)
+    if(index == -1)
+      puts "key no encontrada"
+    else
+      return @values[index].include?(value)  
+    end  
+  end
+
   # Finds if a key is in the keys array or not
   # return: -1 if not found, index of key in array if found
   def find(key)
     i=0
     while i < @keys.size
+      
       if(@keys[i]==key)
         return i
       end
       i+=1
     end
     return -1
-  end
-
-  def is_value(key)
-    index = find(key)
-    return @values[index].include?("")    
   end
 
 end

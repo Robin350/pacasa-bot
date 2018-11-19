@@ -17,11 +17,11 @@ class MyResponses
     @success_remove = ["Borrada correctamente, vaya basura estaba hecha"]
     @greet = ["Bienvenidos, os encontrais ante el mejor bot de telegram, aunque no dejais de ser unos puto inutiles \xF0\x9F\x98\x89 \n\n" + 
       "Voy a introducirme y a decir como funciona la basura esta: \xF0\x9F\x98\x82 \xF0\x9F\x98\x82\n" +
-      "-> /add factura  (añadir una nueva factura)\n" +
-      "-> /add compra   (añadir una nueva compra)\n" +
-      "-> /add nota     (añadir una nueva nota)\n" +
-      "-> /remove factura/compra/nota (quitar una factura/compra de la lista)\n" +
-      "-> /list (mostrar TODO)\n\n" +
+      "-> /add factura/compra/nota\n" +
+      "-> /remove factura/compra/nota\n" +
+      "-> /list factura/compra/nota\n" +
+      "-> /pagada factura/compra\n"+
+      "Solo podra administrar las facturas el administrador, que sera el primero en hablar, y las compras las administrara el que ha haya realizado\n\n"+
       "Y eso es todo, vamos a configurar esto y a ver si con vuestra inteligencia sois capaces de usarlo"]
     @repeated_add = ["Eso ya estaba guardado puto inutil"]
     @repeated_remove = ["Eso no estaba guardado retrasado"]

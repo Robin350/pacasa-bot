@@ -49,13 +49,6 @@ class MyBot
     return answers
   end
 
-  def create_inline_keyboard(options)
-    answers = Telegrammer::DataTypes::InlineKeyboardMarkup
-    .new(keyboard: options)
-
-    return answers
-  end
-
   def get_force_reply(selective)
     return Telegrammer::DataTypes::ForceReply.new(force_reply: true, selective: selective)
   end
