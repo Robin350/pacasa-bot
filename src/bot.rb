@@ -233,7 +233,7 @@ begin
                   text += "    \xF0\x9F\x91\x8C Nadie xdd\n"
               else
                 for p in 2..(item.second.size-1)
-                  text += "    \xE2\x9C\x85 #{item.second.at(p)}"
+                  text += "    \xE2\x9C\x85 #{item.second.at(p)}\n"
                 end
               end
               text += "_______________________\n\n"
