@@ -42,7 +42,7 @@ responses = MyResponses.instance
 begin
   while(!initialized)
     message = pacasa_bot.await_message
-    pacasa_bot.current_chat = message.chat.id
+    pacasa_bot.current_chat = Sting(message.chat.id)
     case message.text
       # When /start we introduce the bot and ask for the flat members information
       when /\/start.*/
@@ -87,7 +87,7 @@ begin
   
   while(true)
     message = pacasa_bot.await_message
-    pacasa_bot.current_chat = message.chat.id
+    pacasa_bot.current_chat = String(message.chat.id)
     #puts "hay mensaje, #{message.text}"
     case message.text
       when /\/pacasa/
@@ -477,7 +477,7 @@ begin
 
 rescue SignalException => e   ################################################################################################################### FIN
   puts "\nSIGNAL => #{e} \nEl bot se ha parado, realizando tareas de mantenimiento...\n"
-
+	raise e
   puts "Hecho, tareas finalizadas, nos vemos\n"
 end
   
